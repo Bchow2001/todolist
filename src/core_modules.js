@@ -8,10 +8,9 @@ export const createToDo = (
 	description,
 	dueDate,
 	priority,
-	notes,
 	checklist,
 	complete = false,
-) => ({ title, description, dueDate, priority, notes, checklist, complete });
+) => ({ title, description, dueDate, priority, checklist, complete });
 
 // creates a project with a default to do for users to edit
 // returns an array which we can append to dos to
@@ -21,7 +20,6 @@ export const createProject = () => {
 		"Include your description...",
 		"Set the due date...",
 		1,
-		"Add additional notes...",
 		{},
 	);
 	return [placeHolderToDo];
