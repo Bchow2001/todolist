@@ -1,3 +1,5 @@
+import { combineDateTime, returnHumanDate } from "./core_modules";
+
 // form input creation function
 const createInput = (type, id, labelDisplay, divClass, placeHolder) => {
 	const inputDiv = document.createElement("div");
@@ -12,6 +14,7 @@ const createInput = (type, id, labelDisplay, divClass, placeHolder) => {
 	input.setAttribute("id", id);
 	input.setAttribute("name", id);
 	input.setAttribute("placeholder", placeHolder);
+	input.required = true;
 	// return
 	inputDiv.appendChild(label);
 	inputDiv.appendChild(input);
@@ -99,6 +102,7 @@ const addChecklistItem = () => {
 		const deleteCheckListItem = document.createElement("span");
 
 		checklistItemLabel.setAttribute("for", checklistInput.value);
+		checklistItemLabel.classList.add("checklist-item");
 		checklistItemLabel.innerText = checklistInput.value;
 
 		checklistItemBox.setAttribute("type", "checkbox");
@@ -173,7 +177,7 @@ const createModal = () => {
 
 	const priorityDisplay = (() => {
 		const priorityDiv = document.createElement("div");
-		priorityDiv.classList.add("priority");
+		priorityDiv.setAttribute("id", "priority");
 		priorityDiv.innerText = "Normal Priority";
 		return priorityDiv;
 	})();
@@ -241,4 +245,26 @@ const createModal = () => {
 	completeCheckbox.addEventListener("change", changeComplete);
 };
 
-export { createModal };
+// function to save form input data to an to-do item
+const saveToDo = () => {
+	const title = document.querySelector("#todo-title").value;
+	const description = document.querySelector("#todo-desc").value;
+	const dueDate = (() => {
+		const dateInput = document.querySelector("#todo-date").value;
+		const timeInput = document.querySelector("#todo-time").value;
+		const combined = combineDateTime(dateInput, timeInput);
+		return returnHumanDate(combined);
+	})();
+	const priority = document.querySelector("#priority").innerText;
+	const checklist = (() => {
+		const checklistItems = document.querySelectorAll(".checklist-item");
+		const checklistArray = [];
+		checklistItems.forEach((item) => {
+			checklistArray.push(item.innerText);
+		});
+		return checklistArray;
+	})();
+	const complete = document.querySelector("#complete-checkbox").checked;
+	console.log(complete);
+};
+export { createModal, saveToDo };

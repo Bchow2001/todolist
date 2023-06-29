@@ -1,6 +1,6 @@
 import * as core from "./core_modules";
 import "./style.css";
-import { createModal } from "./modal";
+import { createModal, saveToDo } from "./modal";
 
 const createNewToDoBtn = document.createElement("button");
 createNewToDoBtn.setAttribute("id", "open-modal");
@@ -30,5 +30,6 @@ span.onclick = function () {
 window.onclick = function (event) {
 	if (event.target == modal) {
 		modal.style.display = "none";
+		saveToDo();
 	}
 };
