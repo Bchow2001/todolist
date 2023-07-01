@@ -1,4 +1,4 @@
-import { combineDateTime, returnHumanDate } from "./core_modules";
+import { combineDateTime, createToDo, returnHumanDate } from "./core_modules";
 
 // form input creation function
 const createInput = (type, id, labelDisplay, divClass, placeHolder) => {
@@ -14,7 +14,6 @@ const createInput = (type, id, labelDisplay, divClass, placeHolder) => {
 	input.setAttribute("id", id);
 	input.setAttribute("name", id);
 	input.setAttribute("placeholder", placeHolder);
-	input.required = true;
 	// return
 	inputDiv.appendChild(label);
 	inputDiv.appendChild(input);
@@ -66,7 +65,7 @@ const createSlider = (id, labelDisplay, value, min, max, divClass) => {
 
 // Change displayed priority based on slider
 const displayPriority = () => {
-	const priorityDiv = document.querySelector(".priority");
+	const priorityDiv = document.querySelector("#priority");
 	switch (Number(document.querySelector("#todo-prio").value)) {
 		case 1:
 			priorityDiv.innerText = "Lowest Priority";
@@ -139,14 +138,14 @@ const changeComplete = () => {
 // create form inputs
 const createModal = () => {
 	const modalWrapper = document.createElement("div");
-	const modalDiv = document.createElement("div");
+	const modalForm = document.createElement("form");
 	modalWrapper.classList.add("modal");
-	modalDiv.classList.add("modal-content");
+	modalForm.classList.add("todo-form");
 
 	const closeModal = document.createElement("span");
 	closeModal.classList.add("close");
 	closeModal.innerText = "×";
-	modalDiv.appendChild(closeModal);
+	modalForm.appendChild(closeModal);
 
 	const toDoTitle = createInput(
 		"text",
@@ -184,11 +183,13 @@ const createModal = () => {
 
 	const addChecklist = (() => {
 		const checklistDiv = document.createElement("div");
+		checklistDiv.classList.add("todo-checklist");
 		const checklistInputDiv = document.createElement("div");
 		checklistInputDiv.setAttribute("id", "checklist-input-div");
 		const checklist = document.createElement("ul");
 		const checklistBtn = document.createElement("button");
 		checklistBtn.setAttribute("id", "checklist-btn");
+		checklistBtn.setAttribute("type", "button");
 		checklistBtn.innerText = "+";
 		checklist.classList.add("checklist");
 		const checklistInput = createInput(
@@ -211,6 +212,7 @@ const createModal = () => {
 		const completeCheckboxLabel = document.createElement("label");
 		const completeCheckbox = document.createElement("input");
 
+		completeDiv.classList.add("todo-complete");
 		completeCheckboxLabel.setAttribute("for", "complete-checkbox");
 		completeCheckboxLabel.setAttribute("id", "complete-checkbox-label");
 		completeCheckboxLabel.innerText = "Incomplete";
@@ -225,15 +227,23 @@ const createModal = () => {
 		return completeDiv;
 	})();
 
-	modalDiv.appendChild(toDoTitle);
-	modalDiv.appendChild(toDoDesc);
-	modalDiv.appendChild(toDoDate);
-	modalDiv.appendChild(toDoTime);
-	modalDiv.appendChild(toDoPrio);
-	modalDiv.appendChild(priorityDisplay);
-	modalDiv.appendChild(addChecklist);
-	modalDiv.appendChild(addCompleteCheck);
-	modalWrapper.appendChild(modalDiv);
+	const addSaveToDoBtn = (() => {
+		const saveToDoBtn = document.createElement("button");
+		saveToDoBtn.setAttribute("id", "save-todo");
+		saveToDoBtn.innerText = "Add To Do Item";
+		return saveToDoBtn;
+	})();
+
+	modalForm.appendChild(toDoTitle);
+	modalForm.appendChild(toDoDesc);
+	modalForm.appendChild(toDoDate);
+	modalForm.appendChild(toDoTime);
+	modalForm.appendChild(toDoPrio);
+	modalForm.appendChild(priorityDisplay);
+	modalForm.appendChild(addChecklist);
+	modalForm.appendChild(addCompleteCheck);
+	modalForm.appendChild(addSaveToDoBtn);
+	modalWrapper.appendChild(modalForm);
 	document.body.appendChild(modalWrapper);
 
 	const prioSlider = document.querySelector("#todo-prio");
@@ -245,8 +255,19 @@ const createModal = () => {
 	completeCheckbox.addEventListener("change", changeComplete);
 };
 
+// function to make inputs required
+const requireInput = () => {
+	const titleInput = document.querySelector("#todo-title");
+	const dateInput = document.querySelector("#todo-date");
+	const timeInput = document.querySelector("#todo-time");
+	titleInput.required = !titleInput.required;
+	dateInput.required = !dateInput.required;
+	timeInput.required = !timeInput.required;
+};
+
 // function to save form input data to an to-do item
 const saveToDo = () => {
+	const modalForm = document.querySelector(".todo-form");
 	const title = document.querySelector("#todo-title").value;
 	const description = document.querySelector("#todo-desc").value;
 	const dueDate = (() => {
@@ -265,6 +286,17 @@ const saveToDo = () => {
 		return checklistArray;
 	})();
 	const complete = document.querySelector("#complete-checkbox").checked;
-	console.log(complete);
+
+	const newToDo = createToDo(
+		title,
+		description,
+		dueDate,
+		priority,
+		checklist,
+		complete,
+	);
+	modalForm.reset();
+	return newToDo;
 };
-export { createModal, saveToDo };
+
+export { createModal, saveToDo, requireInput };

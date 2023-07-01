@@ -15,14 +15,8 @@ export const createToDo = (
 // creates a project with a default to do for users to edit
 // returns an array which we can append to dos to
 export const createProject = () => {
-	const placeHolderToDo = createToDo(
-		"Create Your First To Do Now!",
-		"Include your description...",
-		"Set the due date...",
-		1,
-		{},
-	);
-	return [placeHolderToDo];
+	const placeHolderToDo = [];
+	return placeHolderToDo;
 };
 
 // sets completeness of to do item
