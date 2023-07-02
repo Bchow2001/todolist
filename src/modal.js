@@ -135,11 +135,12 @@ const changeComplete = () => {
 			: "Complete";
 };
 
-// create form inputs
-const createModal = () => {
+// create to do modal
+const createToDoModal = () => {
 	const modalWrapper = document.createElement("div");
 	const modalForm = document.createElement("form");
 	modalWrapper.classList.add("modal");
+	modalWrapper.setAttribute("id", "todo-modal");
 	modalForm.classList.add("todo-form");
 
 	const closeModal = document.createElement("span");
@@ -229,6 +230,7 @@ const createModal = () => {
 
 	const addSaveToDoBtn = (() => {
 		const saveToDoBtn = document.createElement("button");
+		saveToDoBtn.setAttribute("type", "button");
 		saveToDoBtn.setAttribute("id", "save-todo");
 		saveToDoBtn.innerText = "Add To Do Item";
 		return saveToDoBtn;
@@ -255,14 +257,64 @@ const createModal = () => {
 	completeCheckbox.addEventListener("change", changeComplete);
 };
 
+// function to create project modal
+const createProjectModal = () => {
+	const modalWrapper = document.createElement("div");
+	const modalForm = document.createElement("form");
+	modalWrapper.classList.add("modal");
+	modalWrapper.setAttribute("id", "project-modal");
+	modalForm.classList.add("project-form");
+
+	const closeModal = document.createElement("span");
+	closeModal.classList.add("close");
+	closeModal.innerText = "×";
+	modalForm.appendChild(closeModal);
+
+	const projectTitle = createInput(
+		"text",
+		"project-title",
+		"What's the new project?",
+		"project-title-div",
+		"Chores",
+	);
+
+	const projectDesc = createTextArea(
+		"project-desc",
+		"Project Description",
+		"project-desc-div",
+		"Short Description of your project",
+	);
+
+	const addSaveProjectBtn = (() => {
+		const saveProjectBtn = document.createElement("button");
+		saveProjectBtn.setAttribute("type", "button");
+		saveProjectBtn.setAttribute("id", "save-project");
+		saveProjectBtn.innerText = "Save New Project";
+		return saveProjectBtn;
+	})();
+
+	modalForm.appendChild(projectTitle);
+	modalForm.appendChild(projectDesc);
+	modalForm.appendChild(addSaveProjectBtn);
+	modalWrapper.appendChild(modalForm);
+	document.body.appendChild(modalWrapper);
+};
+
 // function to make inputs required
 const requireInput = () => {
-	const titleInput = document.querySelector("#todo-title");
-	const dateInput = document.querySelector("#todo-date");
-	const timeInput = document.querySelector("#todo-time");
-	titleInput.required = !titleInput.required;
-	dateInput.required = !dateInput.required;
-	timeInput.required = !timeInput.required;
+	const toDoTitleInput = document.querySelector("#todo-title");
+	const toDoDateInput = document.querySelector("#todo-date");
+	const toDoTimeInput = document.querySelector("#todo-time");
+	const projectTitleInput = document.querySelector("#project-title");
+	const requiredInputs = [
+		toDoTitleInput,
+		toDoDateInput,
+		toDoTimeInput,
+		projectTitleInput,
+	];
+	requiredInputs.forEach((item) => {
+		item.required = true;
+	});
 };
 
 // function to save form input data to an to-do item
@@ -299,4 +351,4 @@ const saveToDo = () => {
 	return newToDo;
 };
 
-export { createModal, saveToDo, requireInput };
+export { createToDoModal, createProjectModal, saveToDo, requireInput };

@@ -1,53 +1,90 @@
 import * as core from "./core_modules";
 import "./style.css";
-import { createModal, saveToDo, requireInput } from "./modal";
+import {
+	createToDoModal,
+	createProjectModal,
+	saveToDo,
+	requireInput,
+} from "./modal";
 
+// Add a new project button
+const createNewProjectBtn = document.createElement("button");
+createNewProjectBtn.classList.add("modal-button");
+createNewProjectBtn.setAttribute("href", "#project-modal");
+createNewProjectBtn.innerText = "Add a new project";
+
+// Add To Do Button
 const createNewToDoBtn = document.createElement("button");
-createNewToDoBtn.setAttribute("id", "open-modal");
-createNewToDoBtn.innerText = "Add a To Do Item";
+createNewToDoBtn.classList.add("modal-button");
+createNewToDoBtn.setAttribute("href", "#todo-modal");
+createNewToDoBtn.innerText = "Add a new to do item";
+
+document.body.appendChild(createNewProjectBtn);
 document.body.appendChild(createNewToDoBtn);
-createModal();
+createToDoModal();
+createProjectModal();
+requireInput();
 
 const addToDoItem = (() => {
 	const saveToDoBtn = document.querySelector("#save-todo");
 	const toDoForm = document.querySelector(".todo-form");
 	const modal = document.querySelector(".modal");
+	const completeText = document.querySelector("#complete-checkbox-label");
 	saveToDoBtn.addEventListener("click", () => {
 		if (toDoForm.checkValidity() === true) {
 			console.log(saveToDo());
 			modal.style.display = "none";
+			completeText.innerText = "Incomplete";
+		} else {
+			toDoForm.reportValidity();
 		}
 	});
 })();
 
-// Modal open and close
-const modalFunc = (() => {
+const addProject = (() => {
+	const saveProjectBtn = document.querySelector("#save-project");
+	const projectForm = document.querySelector(".project-form");
 	const modal = document.querySelector(".modal");
-	const toDoForm = document.querySelector(".todo-form");
-
-	// Get the button that opens the modal
-	const btn = document.getElementById("open-modal");
-
-	// Get the <span> element that closes the modal
-	const span = document.querySelector(".close");
-
-	// When the user clicks on the button, open the modal
-	btn.onclick = function () {
-		modal.style.display = "block";
-		requireInput();
-	};
-
-	// When the user clicks on <span> (x), close the modal
-	span.onclick = function () {
+	saveProjectBtn.addEventListener("click", () => {
 		modal.style.display = "none";
-		alert("Todo item not saved, please press the add button to save");
-	};
-
-	// When the user clicks anywhere outside of the modal, close it
-	window.onclick = function (event) {
-		if (event.target === modal) {
-			modal.style.display = "none";
-			alert("Todo item not saved, please press the add button to save");
-		}
-	};
+		projectForm.reset();
+	});
 })();
+
+const btn = document.querySelectorAll("button.modal-button");
+
+// All page modals
+const modals = document.querySelectorAll(".modal");
+
+// Get the <span> element that closes the modal
+const spans = document.getElementsByClassName("close");
+
+btn.forEach((item) => {
+	item.onclick = (e) => {
+		e.preventDefault();
+		const modal = document.querySelector(e.target.getAttribute("href"));
+		modal.style.display = "block";
+	};
+});
+
+// When the user clicks on <span> (x), close the modal
+for (let i = 0; i < spans.length; i++) {
+	spans[i].onclick = function () {
+		for (const index in modals) {
+			if (typeof modals[index].style !== "undefined")
+				modals[index].style.display = "none";
+		}
+		alert("Item not saved, please press the save button");
+	};
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function (event) {
+	if (event.target.classList.contains("modal")) {
+		for (const index in modals) {
+			if (typeof modals[index].style !== "undefined")
+				modals[index].style.display = "none";
+		}
+		alert("Item not saved, please press the save button");
+	}
+};
