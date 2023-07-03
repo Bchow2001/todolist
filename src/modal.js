@@ -1,4 +1,9 @@
-import { combineDateTime, createToDo, returnHumanDate } from "./core_modules";
+import {
+	combineDateTime,
+	createToDo,
+	createProject,
+	returnHumanDate,
+} from "./core_modules";
 
 // form input creation function
 const createInput = (type, id, labelDisplay, divClass, placeHolder) => {
@@ -317,6 +322,15 @@ const requireInput = () => {
 	});
 };
 
+// Function to save project input data to a project item
+const saveProject = () => {
+	const projectForm = document.querySelector(".project-form");
+	const projectTitle = document.querySelector("#project-title").value;
+	const projectDesc = document.querySelector("#project-desc").value;
+	projectForm.reset();
+	return createProject(projectTitle, projectDesc);
+};
+
 // function to save form input data to an to-do item
 const saveToDo = () => {
 	const modalForm = document.querySelector(".todo-form");
@@ -351,4 +365,10 @@ const saveToDo = () => {
 	return newToDo;
 };
 
-export { createToDoModal, createProjectModal, saveToDo, requireInput };
+export {
+	createToDoModal,
+	createProjectModal,
+	saveToDo,
+	saveProject,
+	requireInput,
+};
