@@ -9,7 +9,7 @@ import {
 } from "./modal";
 
 const projects = [];
-let currentProject;
+let currentProject = projects[0];
 
 // Add a new project button
 const createNewProjectBtn = document.createElement("button");
@@ -34,6 +34,10 @@ createToDoModal();
 createProjectModal();
 requireInput();
 
+const changeCurrentProject = (i) => {
+	currentProject = projects[i];
+};
+
 const addToDoItem = (() => {
 	const saveToDoBtn = document.querySelector("#save-todo");
 	const toDoForm = document.querySelector(".todo-form");
@@ -41,7 +45,7 @@ const addToDoItem = (() => {
 	const completeText = document.querySelector("#complete-checkbox-label");
 	saveToDoBtn.addEventListener("click", () => {
 		if (toDoForm.checkValidity() === true) {
-			console.log(saveToDo());
+			currentProject.toDoItems.push(saveToDo());
 			modal.style.display = "none";
 			completeText.innerText = "Incomplete";
 		} else {
@@ -58,6 +62,7 @@ const addProject = (() => {
 		if (projectForm.checkValidity() === true) {
 			modal.style.display = "none";
 			projects.push(saveProject());
+			changeCurrentProject(projects.length - 1);
 			displayProjects();
 		} else {
 			projectForm.reportValidity();
@@ -70,9 +75,25 @@ const displayProjects = () => {
 	const projectsArray = [];
 	projects.forEach((item, i) => {
 		const projectItemDiv = document.createElement("div");
+		const deleteProjectItemBtn = document.createElement("span");
+
 		projectItemDiv.classList.add("project-item");
 		projectItemDiv.setAttribute("data-key", i);
 		projectItemDiv.innerText = item.title;
+
+		if (i > 0) {
+			deleteProjectItemBtn.innerText = "×";
+			deleteProjectItemBtn.addEventListener("click", (e) => {
+				e.stopPropagation();
+				const eKey =
+					e.currentTarget.parentNode.getAttribute("data-key");
+				changeCurrentProject(eKey - 1);
+				projects.splice(eKey, 1);
+				displayProjects();
+			});
+		}
+
+		projectItemDiv.appendChild(deleteProjectItemBtn);
 		projectsArray.push(projectItemDiv);
 	});
 	projectsDiv.replaceChildren(...projectsArray);
@@ -83,10 +104,20 @@ const addProjectEventListener = () => {
 	const projectDiv = document.querySelectorAll(".project-item");
 	projectDiv.forEach((el) =>
 		el.addEventListener("click", (event) => {
-			console.log(event.target.getAttribute("data-key"));
+			changeCurrentProject(event.target.getAttribute("data-key"));
 		}),
 	);
 };
+
+const defaultProject = (() => {
+	const defaultProject = core.createProject(
+		"Quick Notes",
+		"Add your quick to dos here",
+	);
+	projects.push(defaultProject);
+	changeCurrentProject(0);
+	displayProjects();
+})();
 
 const modalFunc = (() => {
 	const btn = document.querySelectorAll("button.modal-button");
