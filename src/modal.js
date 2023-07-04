@@ -1,9 +1,4 @@
-import {
-	combineDateTime,
-	createToDo,
-	createProject,
-	returnHumanDate,
-} from "./core_modules";
+import { combineDateTime, createToDo, createProject } from "./core_modules";
 
 // form input creation function
 const createInput = (type, id, labelDisplay, divClass, placeHolder) => {
@@ -340,7 +335,7 @@ const saveToDo = () => {
 		const dateInput = document.querySelector("#todo-date").value;
 		const timeInput = document.querySelector("#todo-time").value;
 		const combined = combineDateTime(dateInput, timeInput);
-		return returnHumanDate(combined);
+		return combined;
 	})();
 	const priority = document.querySelector("#priority").innerText;
 	const checklist = (() => {

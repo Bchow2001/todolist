@@ -25,11 +25,16 @@ createNewToDoBtn.innerText = "Add a new to do item";
 
 // Add a projects div
 const projectsDiv = document.createElement("div");
-projectsDiv.classList.add("projects");
+projectsDiv.classList.add("projects-wrapper");
+
+// Add a wrapper for to do item cards
+const toDoCardsWrapper = document.createElement("div");
+toDoCardsWrapper.classList.add("todo-cards-wrapper");
 
 document.body.appendChild(createNewProjectBtn);
 document.body.appendChild(createNewToDoBtn);
 document.body.appendChild(projectsDiv);
+document.body.appendChild(toDoCardsWrapper);
 createToDoModal();
 createProjectModal();
 requireInput();
@@ -43,11 +48,15 @@ const addToDoItem = (() => {
 	const toDoForm = document.querySelector(".todo-form");
 	const modal = document.querySelector("#todo-modal");
 	const completeText = document.querySelector("#complete-checkbox-label");
+	const priorityText = document.querySelector("#priority");
 	saveToDoBtn.addEventListener("click", () => {
 		if (toDoForm.checkValidity() === true) {
 			currentProject.toDoItems.push(saveToDo());
+			console.log(saveToDo());
+			displayToDoItems();
 			modal.style.display = "none";
 			completeText.innerText = "Incomplete";
+			priorityText.innerText = "Normal Priority";
 		} else {
 			toDoForm.reportValidity();
 		}
@@ -71,7 +80,7 @@ const addProject = (() => {
 })();
 
 const displayProjects = () => {
-	const projectsDiv = document.querySelector(".projects");
+	const projectsDiv = document.querySelector(".projects-wrapper");
 	const projectsArray = [];
 	projects.forEach((item, i) => {
 		const projectItemDiv = document.createElement("div");
@@ -105,6 +114,7 @@ const addProjectEventListener = () => {
 	projectDiv.forEach((el) =>
 		el.addEventListener("click", (event) => {
 			changeCurrentProject(event.target.getAttribute("data-key"));
+			displayToDoItems();
 		}),
 	);
 };
@@ -118,6 +128,63 @@ const defaultProject = (() => {
 	changeCurrentProject(0);
 	displayProjects();
 })();
+
+const displayToDoItems = () => {
+	const toDoCardsWrapper = document.querySelector(".todo-cards-wrapper");
+	const toDoCardsArray = [];
+	currentProject.toDoItems.forEach((item) => {
+		const toDoCard = document.createElement("div");
+		const titleDiv = document.createElement("div");
+		const descDiv = document.createElement("div");
+		const dueDateDiv = document.createElement("div");
+		const priorityDiv = document.createElement("div");
+		const checklistDiv = document.createElement("div");
+		const completeDiv = document.createElement("div");
+		const editItemSpan = document.createElement("span");
+		const deleteItemSpan = document.createElement("span");
+
+		// Assign classes
+		toDoCard.classList.add("todo-card");
+		titleDiv.classList.add("title");
+		descDiv.classList.add("desc");
+		dueDateDiv.classList.add("due-date");
+		priorityDiv.classList.add("priority");
+		checklistDiv.classList.add("checklist");
+		completeDiv.classList.add("complete");
+		editItemSpan.classList.add("edit-todo");
+		deleteItemSpan.classList.add("delete-todo");
+
+		// Loop over checklist items
+		item.checklist.forEach((item) => {
+			const checklistItemDiv = document.createElement("div");
+			checklistItemDiv.innerText = item;
+			checklistDiv.appendChild(checklistItemDiv);
+		});
+
+		// Set div content
+		titleDiv.innerText = item.title;
+		descDiv.innerText = item.description;
+		dueDateDiv.innerText = core.returnHumanDate(item.dueDate);
+		priorityDiv.innerText = item.priority;
+		completeDiv.innerText = item.complete;
+		editItemSpan.innerText = "edit";
+		deleteItemSpan.innerText = "×";
+
+		// Append children to card
+		toDoCard.appendChild(titleDiv);
+		toDoCard.appendChild(descDiv);
+		toDoCard.appendChild(dueDateDiv);
+		toDoCard.appendChild(priorityDiv);
+		toDoCard.appendChild(checklistDiv);
+		toDoCard.appendChild(completeDiv);
+		toDoCard.appendChild(editItemSpan);
+		toDoCard.appendChild(deleteItemSpan);
+
+		// Push Card to cards array
+		toDoCardsArray.push(toDoCard);
+	});
+	toDoCardsWrapper.replaceChildren(...toDoCardsArray);
+};
 
 const modalFunc = (() => {
 	const btn = document.querySelectorAll("button.modal-button");
