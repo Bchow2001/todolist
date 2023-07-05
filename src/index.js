@@ -6,6 +6,7 @@ import {
 	saveToDo,
 	saveProject,
 	requireInput,
+	clearChecklistItems,
 } from "./modal";
 
 const projects = [];
@@ -177,6 +178,7 @@ const addToDoItem = (() => {
 			modal.style.display = "none";
 			completeText.innerText = "Incomplete";
 			priorityText.innerText = "Normal Priority";
+			clearChecklistItems();
 		} else {
 			toDoForm.reportValidity();
 		}

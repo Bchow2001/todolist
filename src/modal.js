@@ -90,7 +90,7 @@ const displayPriority = () => {
 
 // Add checklist items based on user input
 const addChecklistItem = () => {
-	const checklist = document.querySelector(".checklist");
+	const checklist = document.querySelector("ul.checklist");
 	const checklistInput = document.querySelector("#add-checklist");
 	const checklistInputDiv = document.querySelector("#checklist-input-div");
 
@@ -100,8 +100,10 @@ const addChecklistItem = () => {
 		const checklistItemBox = document.createElement("input");
 		const deleteCheckListItem = document.createElement("span");
 
+		checklistItemWrapper.classList.add("checklist-item");
+
 		checklistItemLabel.setAttribute("for", checklistInput.value);
-		checklistItemLabel.classList.add("checklist-item");
+		checklistItemLabel.classList.add("checklist-item-label");
 		checklistItemLabel.innerText = checklistInput.value;
 
 		checklistItemBox.setAttribute("type", "checkbox");
@@ -121,6 +123,10 @@ const addChecklistItem = () => {
 		checklist.insertBefore(checklistItemWrapper, checklistInputDiv);
 	}
 	checklistInput.value = "";
+};
+
+const clearChecklistItems = () => {
+	document.querySelectorAll(".checklist-item").forEach((e) => e.remove());
 };
 
 // Change complete status
@@ -366,4 +372,5 @@ export {
 	saveToDo,
 	saveProject,
 	requireInput,
+	clearChecklistItems,
 };
