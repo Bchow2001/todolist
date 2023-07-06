@@ -99,7 +99,7 @@ const displayProjectDesc = () => {
 const displayToDoItems = () => {
 	const toDoCardsWrapper = document.querySelector(".todo-cards-wrapper");
 	const toDoCardsArray = [];
-	currentProject.toDoItems.forEach((item) => {
+	currentProject.toDoItems.forEach((item, i) => {
 		const toDoCard = document.createElement("div");
 		const titleDiv = document.createElement("div");
 		const descDiv = document.createElement("div");
@@ -109,6 +109,9 @@ const displayToDoItems = () => {
 		const completeDiv = document.createElement("div");
 		const editItemSpan = document.createElement("span");
 		const deleteItemSpan = document.createElement("span");
+
+		// Assign data-attribute to toDo Card for reference
+		toDoCard.setAttribute("data-todo", i);
 
 		// Assign classes
 		toDoCard.classList.add("todo-card");
@@ -123,9 +126,15 @@ const displayToDoItems = () => {
 
 		// Loop over checklist items
 		item.checklist.forEach((ele) => {
+			const checklistItemDivWrapper = document.createElement("div");
 			const checklistItemDiv = document.createElement("div");
+			const checklistItemDelete = document.createElement("span");
+
+			checklistItemDelete.innerText = "×";
 			checklistItemDiv.innerText = ele;
-			checklistDiv.appendChild(checklistItemDiv);
+			checklistItemDivWrapper.appendChild(checklistItemDiv);
+			checklistItemDivWrapper.appendChild(checklistItemDelete);
+			checklistDiv.appendChild(checklistItemDivWrapper);
 		});
 
 		// Set div content
@@ -133,9 +142,14 @@ const displayToDoItems = () => {
 		descDiv.innerText = item.description;
 		dueDateDiv.innerText = core.returnHumanDate(item.dueDate);
 		priorityDiv.innerText = item.priority;
-		completeDiv.innerText = item.complete;
+		completeDiv.innerText = item.complete ? "Complete" : "Incomplete";
 		editItemSpan.innerText = "edit";
 		deleteItemSpan.innerText = "×";
+
+		// Edit Button Func
+		editItemSpan.addEventListener("click", () => {
+			editToDoItem();
+		});
 
 		// Append children to card
 		toDoCard.appendChild(titleDiv);
@@ -164,41 +178,54 @@ const defaultProject = (() => {
 	displayProjectDesc();
 })();
 
-const addToDoItem = (() => {
-	const saveToDoBtn = document.querySelector("#save-todo");
+const saveToDoBtnFunc = () => {
 	const toDoForm = document.querySelector(".todo-form");
 	const modal = document.querySelector("#todo-modal");
 	const completeText = document.querySelector("#complete-checkbox-label");
 	const priorityText = document.querySelector("#priority");
+	if (toDoForm.checkValidity() === true) {
+		currentProject.toDoItems.push(saveToDo());
+		displayToDoItems();
+		toDoForm.reset();
+		modal.style.display = "none";
+		completeText.innerText = "Incomplete";
+		priorityText.innerText = "Normal Priority";
+		clearChecklistItems();
+	} else {
+		toDoForm.reportValidity();
+	}
+};
+
+const addToDo = (() => {
+	const saveToDoBtn = document.querySelector("#save-todo");
 	saveToDoBtn.addEventListener("click", () => {
-		if (toDoForm.checkValidity() === true) {
-			currentProject.toDoItems.push(saveToDo());
-			console.log(saveToDo());
-			displayToDoItems();
-			modal.style.display = "none";
-			completeText.innerText = "Incomplete";
-			priorityText.innerText = "Normal Priority";
-			clearChecklistItems();
-		} else {
-			toDoForm.reportValidity();
-		}
+		saveToDoBtnFunc();
 	});
 })();
 
-const addProject = (() => {
-	const saveProjectBtn = document.querySelector("#save-project");
+const editToDoItem = () => {
+	const modal = document.querySelector("#todo-modal");
+	modal.style.display = "block";
+};
+
+const saveProjectBtnFunc = () => {
 	const projectForm = document.querySelector(".project-form");
 	const modal = document.querySelector("#project-modal");
+	if (projectForm.checkValidity() === true) {
+		modal.style.display = "none";
+		projects.push(saveProject());
+		changeCurrentProject(projects.length - 1);
+		displayProjects();
+		displayProjectDesc();
+	} else {
+		projectForm.reportValidity();
+	}
+};
+
+const addProject = (() => {
+	const saveProjectBtn = document.querySelector("#save-project");
 	saveProjectBtn.addEventListener("click", () => {
-		if (projectForm.checkValidity() === true) {
-			modal.style.display = "none";
-			projects.push(saveProject());
-			changeCurrentProject(projects.length - 1);
-			displayProjects();
-			displayProjectDesc();
-		} else {
-			projectForm.reportValidity();
-		}
+		saveProjectBtnFunc();
 	});
 })();
 

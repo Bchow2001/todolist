@@ -114,7 +114,7 @@ const addChecklistItem = () => {
 		deleteCheckListItem.addEventListener("click", () => {
 			checklistItemWrapper.remove();
 		});
-		deleteCheckListItem.innerText = "x";
+		deleteCheckListItem.innerText = "×";
 
 		checklistItemWrapper.appendChild(checklistItemLabel);
 		checklistItemWrapper.appendChild(checklistItemBox);
@@ -345,7 +345,9 @@ const saveToDo = () => {
 	})();
 	const priority = document.querySelector("#priority").innerText;
 	const checklist = (() => {
-		const checklistItems = document.querySelectorAll(".checklist-item");
+		const checklistItems = document.querySelectorAll(
+			".checklist-item-label",
+		);
 		const checklistArray = [];
 		checklistItems.forEach((item) => {
 			checklistArray.push(item.innerText);
