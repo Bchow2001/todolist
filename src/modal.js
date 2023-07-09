@@ -334,15 +334,10 @@ const saveProject = () => {
 
 // function to save form input data to an to-do item
 const saveToDo = () => {
-	const modalForm = document.querySelector(".todo-form");
 	const title = document.querySelector("#todo-title").value;
 	const description = document.querySelector("#todo-desc").value;
-	const dueDate = (() => {
-		const dateInput = document.querySelector("#todo-date").value;
-		const timeInput = document.querySelector("#todo-time").value;
-		const combined = combineDateTime(dateInput, timeInput);
-		return combined;
-	})();
+	const dueDate = document.querySelector("#todo-date").value;
+	const dueTime = document.querySelector("#todo-time").value;
 	const priority = document.querySelector("#priority").innerText;
 	const checklist = (() => {
 		const checklistItems = document.querySelectorAll(
@@ -360,11 +355,11 @@ const saveToDo = () => {
 		title,
 		description,
 		dueDate,
+		dueTime,
 		priority,
 		checklist,
 		complete,
 	);
-	modalForm.reset();
 	return newToDo;
 };
 

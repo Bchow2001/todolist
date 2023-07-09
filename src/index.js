@@ -11,6 +11,7 @@ import {
 
 const projects = [];
 let currentProject = projects[0];
+let editItem;
 
 // Add a new project button
 const createNewProjectBtn = document.createElement("button");
@@ -44,6 +45,8 @@ document.body.appendChild(toDoCardsWrapper);
 createToDoModal();
 createProjectModal();
 requireInput();
+
+const saveToDoBtn = document.querySelector("#save-todo");
 
 const changeCurrentProject = (i) => {
 	currentProject = projects[i];
@@ -125,12 +128,29 @@ const displayToDoItems = () => {
 		deleteItemSpan.classList.add("delete-todo");
 
 		// Loop over checklist items
-		item.checklist.forEach((ele) => {
+		item.checklist.forEach((ele, i) => {
 			const checklistItemDivWrapper = document.createElement("div");
 			const checklistItemDiv = document.createElement("div");
 			const checklistItemDelete = document.createElement("span");
 
+			checklistItemDivWrapper.setAttribute("data-checklist", i);
+
 			checklistItemDelete.innerText = "×";
+
+			checklistItemDelete.addEventListener("click", (e) => {
+				e.stopPropagation();
+				const eCheckIndex =
+					e.currentTarget.parentNode.getAttribute("data-checklist");
+				const eIndex =
+					e.currentTarget.parentNode.parentNode.parentNode.getAttribute(
+						"data-todo",
+					);
+				currentProject.toDoItems[eIndex].checklist.splice(
+					eCheckIndex,
+					1,
+				);
+				displayToDoItems();
+			});
 			checklistItemDiv.innerText = ele;
 			checklistItemDivWrapper.appendChild(checklistItemDiv);
 			checklistItemDivWrapper.appendChild(checklistItemDelete);
@@ -140,15 +160,28 @@ const displayToDoItems = () => {
 		// Set div content
 		titleDiv.innerText = item.title;
 		descDiv.innerText = item.description;
-		dueDateDiv.innerText = core.returnHumanDate(item.dueDate);
+		dueDateDiv.innerText = core.returnHumanDate(
+			core.combineDateTime(item.dueDate, item.dueTime),
+		);
 		priorityDiv.innerText = item.priority;
 		completeDiv.innerText = item.complete ? "Complete" : "Incomplete";
 		editItemSpan.innerText = "edit";
 		deleteItemSpan.innerText = "×";
 
 		// Edit Button Func
-		editItemSpan.addEventListener("click", () => {
-			editToDoItem();
+		editItemSpan.addEventListener("click", (e) => {
+			const toDoModal = document.querySelector("#todo-modal");
+			toDoModal.style.display = "block";
+			editItem = e.currentTarget.parentNode.getAttribute("data-todo");
+			saveToDoBtn.removeEventListener("click", saveToDoBtnFunc);
+			saveToDoBtn.addEventListener("click", editToDoItem, { once: true });
+		});
+
+		deleteItemSpan.addEventListener("click", (e) => {
+			e.stopPropagation();
+			const eIndex = e.currentTarget.parentNode.getAttribute("data-todo");
+			currentProject.toDoItems.splice(eIndex, 1);
+			displayToDoItems();
 		});
 
 		// Append children to card
@@ -178,34 +211,43 @@ const defaultProject = (() => {
 	displayProjectDesc();
 })();
 
-const saveToDoBtnFunc = () => {
+const resetModal = () => {
 	const toDoForm = document.querySelector(".todo-form");
 	const modal = document.querySelector("#todo-modal");
 	const completeText = document.querySelector("#complete-checkbox-label");
 	const priorityText = document.querySelector("#priority");
+	toDoForm.reset();
+	modal.style.display = "none";
+	completeText.innerText = "Incomplete";
+	priorityText.innerText = "Normal Priority";
+	clearChecklistItems();
+};
+
+const saveToDoBtnFunc = () => {
+	const toDoForm = document.querySelector(".todo-form");
 	if (toDoForm.checkValidity() === true) {
 		currentProject.toDoItems.push(saveToDo());
 		displayToDoItems();
-		toDoForm.reset();
-		modal.style.display = "none";
-		completeText.innerText = "Incomplete";
-		priorityText.innerText = "Normal Priority";
-		clearChecklistItems();
+		resetModal();
 	} else {
 		toDoForm.reportValidity();
 	}
 };
 
 const addToDo = (() => {
-	const saveToDoBtn = document.querySelector("#save-todo");
-	saveToDoBtn.addEventListener("click", () => {
-		saveToDoBtnFunc();
-	});
+	saveToDoBtn.addEventListener("click", saveToDoBtnFunc);
 })();
 
 const editToDoItem = () => {
-	const modal = document.querySelector("#todo-modal");
-	modal.style.display = "block";
+	const toDoForm = document.querySelector(".todo-form");
+	if (toDoForm.checkValidity() === true) {
+		currentProject.toDoItems[editItem] = saveToDo();
+		saveToDoBtn.addEventListener("click", saveToDoBtnFunc);
+		displayToDoItems();
+		resetModal();
+	} else {
+		toDoForm.reportValidity();
+	}
 };
 
 const saveProjectBtnFunc = () => {
@@ -224,9 +266,7 @@ const saveProjectBtnFunc = () => {
 
 const addProject = (() => {
 	const saveProjectBtn = document.querySelector("#save-project");
-	saveProjectBtn.addEventListener("click", () => {
-		saveProjectBtnFunc();
-	});
+	saveProjectBtn.addEventListener("click", saveProjectBtnFunc);
 })();
 
 const modalFunc = (() => {
@@ -248,23 +288,31 @@ const modalFunc = (() => {
 
 	// When the user clicks on <span> (x), close the modal
 	for (let i = 0; i < spans.length; i++) {
-		spans[i].onclick = function () {
-			for (const index in modals) {
-				if (typeof modals[index].style !== "undefined")
-					modals[index].style.display = "none";
-			}
+		spans[i].onclick = () => {
+			modals.forEach((item, i) => {
+				if (typeof modals[i].style !== "undefined") {
+					modals[i].style.display = "none";
+					saveToDoBtn.removeEventListener("click", editToDoItem);
+					saveToDoBtn.addEventListener("click", saveToDoBtnFunc);
+				}
+			});
 			alert("Item not saved, please press the save button");
+			resetModal();
 		};
 	}
 
 	// When the user clicks anywhere outside of the modal, close it
-	window.onclick = function (event) {
+	window.onclick = (event) => {
 		if (event.target.classList.contains("modal")) {
-			for (const index in modals) {
-				if (typeof modals[index].style !== "undefined")
-					modals[index].style.display = "none";
-			}
+			modals.forEach((item, i) => {
+				if (typeof modals[i].style !== "undefined") {
+					modals[i].style.display = "none";
+					saveToDoBtn.removeEventListener("click", editToDoItem);
+					saveToDoBtn.addEventListener("click", saveToDoBtnFunc);
+				}
+			});
 			alert("Item not saved, please press the save button");
+			resetModal();
 		}
 	};
 })();
