@@ -238,7 +238,7 @@ const createToDoModal = () => {
 		const saveToDoBtn = document.createElement("button");
 		saveToDoBtn.setAttribute("type", "button");
 		saveToDoBtn.setAttribute("id", "save-todo");
-		saveToDoBtn.innerText = "Add To Do Item";
+		saveToDoBtn.innerText = "Save Item";
 		return saveToDoBtn;
 	})();
 
