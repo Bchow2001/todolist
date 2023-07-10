@@ -20,35 +20,6 @@ export const createProject = (title, desc) => {
 	return project;
 };
 
-// sets completeness of to do item
-export const setComplete = (toDoItem) => {
-	// eslint-disable-next-line no-param-reassign
-	toDoItem.complete = !toDoItem.complete;
-};
-
-// sets priority of to do item
-export const setPriority = (toDoItem, newPriority) => {
-	toDoItem.priority = newPriority;
-};
-
-// changes state of checklist items
-export const setChecklist = (toDoItem, checklistItem) => {
-	if (toDoItem.checklist[checklistItem] !== undefined) {
-		toDoItem.checklist[checklistItem] = toDoItem.checklist[checklistItem]
-			? 0
-			: 1;
-	}
-};
-
-// adds checklist items
-export const addChecklistItem = (toDoItem, checklistItem) => {
-	if (toDoItem.checklist[checklistItem] === undefined) {
-		toDoItem.checklist[checklistItem] = 0;
-	} else {
-		return `${checklistItem} already exists`;
-	}
-};
-
 // combines date and time inputs to a date object
 export const combineDateTime = (dateInput, timeInput) => {
 	const dateTime = `${dateInput} ${timeInput}`;

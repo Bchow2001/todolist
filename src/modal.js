@@ -1,4 +1,4 @@
-import { combineDateTime, createToDo, createProject } from "./core_modules";
+import { createToDo, createProject } from "./core_modules";
 
 // form input creation function
 const createInput = (type, id, labelDisplay, divClass, placeHolder) => {

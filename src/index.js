@@ -9,7 +9,8 @@ import {
 	clearChecklistItems,
 } from "./modal";
 
-const projects = [];
+let projects = [];
+
 let currentProject = projects[0];
 let editItem;
 
@@ -37,16 +38,24 @@ toDoCardsWrapper.classList.add("todo-cards-wrapper");
 const projectDescWrapper = document.createElement("div");
 projectDescWrapper.classList.add("project-desc-wrapper");
 
+// Add a clear data button
+const clearDataNode = document.createElement("button");
+clearDataNode.innerText = "Clear All Data";
+clearDataNode.setAttribute("id", "clear-data");
+
 document.body.appendChild(projectsDiv);
 document.body.appendChild(projectDescWrapper);
 document.body.appendChild(createNewProjectBtn);
 document.body.appendChild(createNewToDoBtn);
 document.body.appendChild(toDoCardsWrapper);
+document.body.appendChild(clearDataNode);
 createToDoModal();
 createProjectModal();
 requireInput();
 
 const saveToDoBtn = document.querySelector("#save-todo");
+const saveProjectBtn = document.querySelector("#save-project");
+const clearDataBtn = document.querySelector("#clear-data");
 
 const changeCurrentProject = (i) => {
 	currentProject = projects[i];
@@ -200,16 +209,45 @@ const displayToDoItems = () => {
 	toDoCardsWrapper.replaceChildren(...toDoCardsArray);
 };
 
-const defaultProject = (() => {
-	const defaultProject = core.createProject(
-		"Quick Notes",
-		"Add your quick to dos here",
-	);
-	projects.push(defaultProject);
-	changeCurrentProject(0);
-	displayProjects();
-	displayProjectDesc();
-})();
+const saveProjectBtnFunc = () => {
+	const projectForm = document.querySelector(".project-form");
+	const modal = document.querySelector("#project-modal");
+	if (projectForm.checkValidity() === true) {
+		modal.style.display = "none";
+		projects.push(saveProject());
+		localStorage.setItem("projectStorage", JSON.stringify(projects));
+		changeCurrentProject(projects.length - 1);
+		displayProjects();
+		displayProjectDesc();
+	} else {
+		projectForm.reportValidity();
+	}
+};
+
+const saveToDoBtnFunc = () => {
+	const toDoForm = document.querySelector(".todo-form");
+	if (toDoForm.checkValidity() === true) {
+		currentProject.toDoItems.push(saveToDo());
+		localStorage.setItem("projectStorage", JSON.stringify(projects));
+		displayToDoItems();
+		resetModal();
+	} else {
+		toDoForm.reportValidity();
+	}
+};
+
+const editToDoItem = () => {
+	const toDoForm = document.querySelector(".todo-form");
+	if (toDoForm.checkValidity() === true) {
+		currentProject.toDoItems[editItem] = saveToDo();
+		saveToDoBtn.addEventListener("click", saveToDoBtnFunc);
+		localStorage.setItem("projectStorage", JSON.stringify(projects));
+		displayToDoItems();
+		resetModal();
+	} else {
+		toDoForm.reportValidity();
+	}
+};
 
 const resetModal = () => {
 	const toDoForm = document.querySelector(".todo-form");
@@ -223,50 +261,30 @@ const resetModal = () => {
 	clearChecklistItems();
 };
 
-const saveToDoBtnFunc = () => {
-	const toDoForm = document.querySelector(".todo-form");
-	if (toDoForm.checkValidity() === true) {
-		currentProject.toDoItems.push(saveToDo());
-		displayToDoItems();
-		resetModal();
-	} else {
-		toDoForm.reportValidity();
-	}
+const clearData = () => {
+	localStorage.clear();
+	location.reload();
 };
 
-const addToDo = (() => {
-	saveToDoBtn.addEventListener("click", saveToDoBtnFunc);
+const defaultProjectFunc = (() => {
+	const defaultProject = core.createProject(
+		"Quick Notes",
+		"Add your quick to dos here",
+	);
+	projects.push(defaultProject);
+	changeCurrentProject(0);
+	displayProjects();
+	displayProjectDesc();
 })();
 
-const editToDoItem = () => {
-	const toDoForm = document.querySelector(".todo-form");
-	if (toDoForm.checkValidity() === true) {
-		currentProject.toDoItems[editItem] = saveToDo();
-		saveToDoBtn.addEventListener("click", saveToDoBtnFunc);
-		displayToDoItems();
-		resetModal();
-	} else {
-		toDoForm.reportValidity();
-	}
-};
-
-const saveProjectBtnFunc = () => {
-	const projectForm = document.querySelector(".project-form");
-	const modal = document.querySelector("#project-modal");
-	if (projectForm.checkValidity() === true) {
-		modal.style.display = "none";
-		projects.push(saveProject());
-		changeCurrentProject(projects.length - 1);
+const retrieveData = (() => {
+	if (localStorage.getItem("projectStorage") !== null) {
+		projects = JSON.parse(localStorage.getItem("projectStorage"));
+		currentProject = projects[0];
 		displayProjects();
 		displayProjectDesc();
-	} else {
-		projectForm.reportValidity();
+		displayToDoItems();
 	}
-};
-
-const addProject = (() => {
-	const saveProjectBtn = document.querySelector("#save-project");
-	saveProjectBtn.addEventListener("click", saveProjectBtnFunc);
 })();
 
 const modalFunc = (() => {
@@ -316,3 +334,11 @@ const modalFunc = (() => {
 		}
 	};
 })();
+
+saveToDoBtn.addEventListener("click", saveToDoBtnFunc);
+saveProjectBtn.addEventListener("click", saveProjectBtnFunc);
+clearDataBtn.addEventListener("click", clearData);
+
+displayProjects();
+displayProjectDesc();
+displayToDoItems();
